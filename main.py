@@ -2,11 +2,17 @@ from sys import argv
 from pydub import AudioSegment
 from pydub.playback import play
 from os.path import exists
+from io import BytesIO
+from typing import List
 
+# Show command usage
 def showUsage() -> None:
     print("Usage : " + argv[0] + " <audioPath> <sentence>")
 
-def main(argc, argv) -> None:
+# Checks if given arguments are well formed.
+# If not, then exit the program.
+# If yes, then returns a tuple (audio, message)
+def entryVerification(argc: int, argv: List[str]) -> tuple[AudioSegment, str]:
     if argc < 2:
         print("Missing audio file to read.")
         showUsage()
@@ -26,16 +32,38 @@ def main(argc, argv) -> None:
         exit(4)
 
     try:
-        loop = AudioSegment.from_file(argv[1])
+        audio = AudioSegment.from_file(argv[1])
+
+        return (audio, argv[2])
+
     except:
         print("Could not load audio")
-
-    try:
-        play(loop)
-    except:
-        print() # if Ctrl^C
+        exit(5)
 
 
+# Converts a string to a byte array and returns the result
+def convertStringtoBytes(string: str) -> bytes:
+    return bytes(string, 'utf-8')
 
+
+def createAudioFromBytes(bytesArray: bytes):
+    return AudioSegment.from_file(BytesIO(bytesArray), format="mp3")
+
+
+# Main process
+def main(argc, argv) -> None:
+    (audio, message) = entryVerification(argc, argv)
+
+    bMsg = convertStringtoBytes(message)
+
+    hiddenAudio = createAudioFromBytes(bMsg)
+
+    finalAudio = audio.overlay(hiddenAudio)
+
+    play(finalAudio)
+
+
+
+#
 if __name__ == "__main__":
     main(len(argv), argv)
