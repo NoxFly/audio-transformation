@@ -4,6 +4,8 @@ from pydub.playback import play
 from os.path import exists
 from io import BytesIO
 from typing import List
+from gtts import gTTS
+import os
 
 # Show command usage
 def showUsage() -> None:
@@ -41,28 +43,43 @@ def entryVerification(argc: int, argv: List[str]) -> tuple[AudioSegment, str]:
         exit(5)
 
 
-# Converts a string to a byte array and returns the result
+# Never used
 def convertStringtoBytes(string: str) -> bytes:
-    return bytes(string, 'utf-8')
+    return bytes(string, 'utf-8')   
 
-
+# Never used
 def createAudioFromBytes(bytesArray: bytes):
-    return AudioSegment.from_file(BytesIO(bytesArray), format="mp3")
+    return AudioSegment.from_file(BytesIO(bytesArray)).export("resources/audio/result.mp3",format="mp3")
 
+
+def createAudiofromString(msg: str) -> AudioSegment:
+    language = 'fr'
+    myobj = gTTS(text=msg, lang=language, slow=False)
+    myobj.save("resources/audio/tmp/tmp.mp3")
+    audio = AudioSegment.from_mp3("resources/audio/tmp/tmp.mp3")
+    return audio
 
 # Main process
 def main(argc, argv) -> None:
     (audio, message) = entryVerification(argc, argv)
 
-    bMsg = convertStringtoBytes(message)
+    positions = [1000, 5000, 9000, 13000, 17000, 21000, 25000] # toutes les 4 sec
 
-    hiddenAudio = createAudioFromBytes(bMsg)
+    # -- Avant le 24/09
+    #bMsg = convertStringtoBytes(message)
+    #hiddenAudio = createAudioFromBytes(bMsg)
 
-    finalAudio = audio.overlay(hiddenAudio)
+    hiddenAudio = createAudiofromString(message)
+    hiddenAudio = hiddenAudio - 22
+    audio = audio - 20
+    for position in positions:
+        audio = audio.overlay(hiddenAudio, position=position)
+    
+    finalAudio = audio
 
-    play(finalAudio)
+    #play(finalAudio)
 
-
+    finalAudio.export("resources/audio/results/result.mp3", format="mp3")
 
 #
 if __name__ == "__main__":
