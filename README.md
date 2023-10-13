@@ -1,4 +1,4 @@
-# Audio transformation
+# Text-To-Speech Adversarial Attack
 
 University project.
 
@@ -16,14 +16,12 @@ This is to reproduce the Adverse Examples attacks.
     * On linux : `sudo apt-get install ffmpeg`
 1. Install Numpu : `pip install numpy`
 
-## Run
+## Execution
 
 ```py
 # use py or python3 depending what you have
-py main.py [args]
+py main.py <audio_path> <text-to-speech>
 ```
-
-For now, input entry is not used. Latter it may be the audio file to treat, or the sentence to create audio from (TTS).
 
 ## Licence
 
