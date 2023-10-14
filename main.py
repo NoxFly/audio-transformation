@@ -5,6 +5,7 @@ from os.path import exists
 from io import BytesIO
 from typing import List
 from gtts import gTTS
+import numpy as np
 import os
 
 # Show command usage
@@ -59,9 +60,25 @@ def createAudiofromString(msg: str) -> AudioSegment:
     audio = AudioSegment.from_mp3("resources/audio/tmp/tmp.mp3")
     return audio
 
+def readMessagefromAudio(audio: AudioSegment, origin: AudioSegment) -> str:
+    hidden_message = ""
+    
+    # Convert audio and origin to raw binary data
+    audio_binary = audio.raw_data
+    origin_binary = origin.raw_data
+
+    # Iterate through binary data and find differences
+    for audio_byte, origin_byte in zip(audio_binary, origin_binary):
+        if audio_byte != origin_byte:
+            hidden_message += format(audio_byte, '08b')
+
+    return hidden_message
+
 # Main process
 def main(argc, argv) -> None:
     (audio, message) = entryVerification(argc, argv)
+
+    origin = audio
 
     positions = [1000, 5000, 9000, 13000, 17000, 21000, 25000] # toutes les 4 sec
 
@@ -80,6 +97,12 @@ def main(argc, argv) -> None:
     #play(finalAudio)
 
     finalAudio.export("resources/audio/results/result.mp3", format="mp3")
+
+    audioDecode = AudioSegment.from_mp3("resources/audio/results/result.mp3")
+
+    message = readMessagefromAudio(audioDecode,origin)
+
+    print("Message : ",message)
 
 #
 if __name__ == "__main__":
