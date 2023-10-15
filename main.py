@@ -63,14 +63,19 @@ def createAudiofromString(msg: str) -> AudioSegment:
 def readMessagefromAudio(audio: AudioSegment, origin: AudioSegment) -> str:
     hidden_message = ""
     
+    audio_data = audio.get_array_of_samples()
+    origin_data = origin.get_array_of_samples()
     # Convert audio and origin to raw binary data
     audio_binary = audio.raw_data
     origin_binary = origin.raw_data
 
-    # Iterate through binary data and find differences
-    for audio_byte, origin_byte in zip(audio_binary, origin_binary):
-        if audio_byte != origin_byte:
-            hidden_message += format(audio_byte, '08b')
+    #print(audio_data)
+    #print(origin_data)
+
+    for i in range(min(len(audio_data), len(origin_data))):
+        if audio_data[i] != origin_data[i]:
+            hidden_message += str(audio_data[i])
+            print(hidden_message)
 
     return hidden_message
 
