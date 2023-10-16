@@ -7,6 +7,9 @@ from typing import List
 from gtts import gTTS
 import numpy as np
 import os
+import speech_recognition as sr
+
+r = sr.Recognizer()
 
 # Show command usage
 def showUsage() -> None:
@@ -58,36 +61,29 @@ def createAudiofromString(msg: str) -> AudioSegment:
     myobj = gTTS(text=msg, lang=language, slow=False)
     myobj.save("resources/audio/tmp/tmp.mp3")
     audio = AudioSegment.from_mp3("resources/audio/tmp/tmp.mp3")
+    os.remove("resources/audio/tmp/tmp.mp3")
     return audio
 
-def readMessagefromAudio(audio: AudioSegment, origin: AudioSegment) -> str:
-    hidden_message = ""
+def readMessagefromAudio(path: str,lang = 'fr'):
+    if not path.endswith(".wav"):
+        print("Unsupported audio format.")
+        exit(6)
     
-    audio_data = audio.get_array_of_samples()
-    origin_data = origin.get_array_of_samples()
-    # Convert audio and origin to raw binary data
-    audio_binary = audio.raw_data
-    origin_binary = origin.raw_data
-
-    #print(audio_data)
-    #print(origin_data)
-
-    for i in range(min(len(audio_data), len(origin_data))):
-        if audio_data[i] != origin_data[i]:
-            hidden_message += str(audio_data[i])
-            print(hidden_message)
-
-    return hidden_message
+    with sr.AudioFile(path) as source:
+        audio_file = r.record(source)
+        try:
+            print(r.recognize_google(audio_file, language=lang))
+        except:
+            print("No message found.")
+            exit(7)
 
 # Main process
 def main(argc, argv) -> None:
     (audio, message) = entryVerification(argc, argv)
 
-    origin = audio
-
     positions = [1000, 5000, 9000, 13000, 17000, 21000, 25000] # toutes les 4 sec
 
-    # -- Avant le 24/09
+    # -- Avant le 24/09S
     #bMsg = convertStringtoBytes(message)
     #hiddenAudio = createAudioFromBytes(bMsg)
 
@@ -99,15 +95,9 @@ def main(argc, argv) -> None:
     
     finalAudio = audio
 
-    #play(finalAudio)
+    finalAudio.export("resources/audio/results/result.wav", format="wav")
 
-    finalAudio.export("resources/audio/results/result.mp3", format="mp3")
-
-    audioDecode = AudioSegment.from_mp3("resources/audio/results/result.mp3")
-
-    message = readMessagefromAudio(audioDecode,origin)
-
-    print("Message : ",message)
+    readMessagefromAudio("resources/audio/results/result.wav")
 
 #
 if __name__ == "__main__":
