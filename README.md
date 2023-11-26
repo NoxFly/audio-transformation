@@ -10,7 +10,7 @@ This is to reproduce the Adverse Examples attacks.
 ## Requires
 
 1. Install python3 (with pip)
-1. Install all needed packages (PyDub, gTTS, Numpy, SpeechRecognition, ffmpeg) : `pip install pydub gtts numpy SpeechRecognition ffpmeg`
+1. Install all needed packages (PyDub, gTTS, Numpy, SpeechRecognition, ffmpeg) : `pip install pydub gtts numpy SpeechRecognition ffmpeg`
 1. Install ffmpeg on OS :
     * On Windows :
         1. Download the zip : `https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip`
